@@ -79,6 +79,17 @@ platform :ios do
     )
   end
 
+  lane :build do
+    build_app(
+      scheme: ENV['SCHEME'],
+      output_directory: "./fastlane/builds/",
+    )
+  end
+
+  lane: test_flight do
+    pilot(skip_waiting_for_build_processing: true)
+  end 
+
 
 
   desc "Upload to TestFlight"
@@ -124,16 +135,6 @@ platform :ios do
         ipa: "fastlane/builds/#{ENV["ENV_NAME"]}/#{ENV["APP_NAME"]}.ipa"
       )
     }
-  end
-
-  desc "Build for app store distribution"
-  lane :build do
-    if ENV['SCHEME'] != nil
-      match(type: "appstore")
-      gym
-    else
-      execute_for_all_envs{ build }
-    end
   end
 
   desc "Options: "

@@ -27,3 +27,7 @@ jobs:
           MATCH_REPO: ${{ secrets.MATCH_REPO }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+
+      - run: bundle exec fastlane build
+        env:
+          SCHEME: Release
