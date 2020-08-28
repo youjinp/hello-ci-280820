@@ -1,0 +1,189 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+##############################################################################
+# Manual setup
+##############################################################################
+# create gemfile
+# fastlane init
+# (optional, if init hasn't created) fl produce
+# fl match init -> point to private repo
+# fl match development
+# fl match adhoc
+# fl match appstore
+# (manual) xcode > target > signing & capabilities > select generated certificates
+# (manual) restart xcode if necessary
+# fl gym init
+# (manual) xcode > select target > build settings > set `Versioning System` to `Apple Generic`
+# (manual) xcode > select target > build settings > set  `Current Project Version` to `0`
+# (manual) check target > general > identity > version value is 0.0.0
+# (manual) check target > general > identity > build value is 0
+
+##############################################################################
+# More info about match private repo
+##############################################################################
+# Setup up a private repo solely for storing team certificates
+# - have mfa on accounts that can access that repo
+# - optional: dedicated apple developer portal account dedicated to the team's assets
+#   - avoids mixing team and personal assets in the same bucket
+#
+##############################################################################
+# Fastfile usage
+##############################################################################
+
+default_platform(:ios)
+
+platform :ios do
+
+  before_all do
+    ensure_bundle_exec
+  end
+
+  lane :ci_setup do
+    create_keychain(
+      name: "fastlane_ci",
+      password: "ci_password",
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+    )
+
+    match(
+      app_identifier: ENV['APP_IDENTIFIER'],
+      username: ENV['APPLE_ID'],
+      team_id: ENV['TEAM_ID'],
+      git_url: ENV['MATCH_REPO'],
+      type: "development", 
+      readonly: true, 
+      keychain_name: 'fastlane_ci', 
+      keychain_password: 'ci_password'
+    )
+
+    match(
+      app_identifier: ENV['APP_IDENTIFIER'],
+      username: ENV['APPLE_ID'],
+      team_id: ENV['TEAM_ID'],
+      git_url: ENV['MATCH_REPO']
+      type: "appstore", 
+      readonly: true, 
+      keychain_name: 'fastlane_ci', 
+      keychain_password: 'ci_password'
+    )
+  end
+
+
+
+  desc "Upload to TestFlight"
+  desc "Options:"
+  desc "  - bump_type (none, patch, minor, major)"
+  lane :test_flight do |options|
+
+    changelog = build_with_git(bump_type: options[:bump_type]) 
+
+    beta = JSON.parse(File.read("./resources/beta-app.json"))
+
+    execute_for_all_envs{
+      pilot(
+        # changes
+        changelog: changelog,
+
+        # review info
+        demo_account_required: true, 
+
+        beta_app_review_info: {
+          contact_email: beta["contactEmail"],
+          contact_first_name: beta["contactFirstName"],
+          contact_last_name: beta["contactLastName"],
+          contact_phone: beta["contactPhone"],
+          demo_account_name: beta["demoAccountName"],
+          notes: beta["notes"]
+        },
+
+        # app info
+        localized_app_info: {
+          "default": {
+            feedback_email: beta["feedbackEmail"],
+            marketing_url: beta["marketingURL"],
+            privacy_policy_url: beta["privacyURL"],
+            description: beta["description"]
+          },
+        },
+
+        # 
+        team_name: ENV['TEAM_NAME'],
+        app_identifier: ENV['BUNDLE_IDENTIFIER'],
+        skip_submission: true,
+        ipa: "fastlane/builds/#{ENV["ENV_NAME"]}/#{ENV["APP_NAME"]}.ipa"
+      )
+    }
+  end
+
+  desc "Build for app store distribution"
+  lane :build do
+    if ENV['SCHEME'] != nil
+      match(type: "appstore")
+      gym
+    else
+      execute_for_all_envs{ build }
+    end
+  end
+
+  desc "Options: "
+  desc "  - bump_type "
+  private_lane :build_with_git do |options|
+
+    # beginning git actions
+    ensure_git_status_clean
+
+    # meat
+    version_number = bump(bump_type: options[:bump_type])
+    build_number = increment_build_number
+    changelog = read_and_stamp_change_log
+    build
+
+    # ending git actions
+    complete_version_number = version_string(version_number, build_number)
+    commit_version_bump(
+      force: true, # Forces the commit, even if other files than the ones containing the version number have been modified
+      include: %w[CHANGELOG.md], # include other updated files as part of the version bump
+      message: "Version bumped to #{complete_version_number}",
+      xcodeproj: ENV["PROJECT"]
+    )
+    add_git_tag(
+      tag: "v#{version_number}",
+      force: true # The latest build of a version gets a tag
+    )
+    add_git_tag(
+      tag: "b#{build_number}"
+    )
+    # push_to_git_remote
+    changelog
+
+  end
+
+  desc "Options: "
+  # desc "  - use_changelog"
+  private_lane :read_and_stamp_change_log do
+
+    version_number = get_version_number
+    build_number = get_build_number
+    complete_version_number = version_string(version_number, build_number)
+
+    UI.message("Reading changelog.md.")
+    changelog = read_changelog
+    stamp_changelog(
+      section_identifier: complete_version_number,
+      git_tag: "b#{build_number}" # Specify reference to git tag associated with this section
+    )
+
+    changelog
+  end
+end

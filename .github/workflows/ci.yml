@@ -1,0 +1,49 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: sudo bundle install
+
+      # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md#xcode
+      - run: sudo xcode-select -s /Applications/Xcode_12_beta.app
+
+      - run: bundle exec fastlane fastlane-credentials add --username ${APPLE_ID} --password ${APPLE_PASSWORD}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+
+      - run: bundle exec fastlane ci_setup
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+          MATCH_REPO: ${{ secrets.MATCH_REPO }}
+          MATCH_PASSWORD: ${{ secret.MATCH_PASSWORD }}
+      # - name: Run fastlane setup
+      #   env:
+      #     APPLE_ACCOUNT: ${{ secrets.APPLE_ACCOUNT }}
+      #     TEAM_ID: ${{ secrets.TEAM_ID }}
+      #   run: |
+      #     fastlane setup --verbose
+      # - name: Run fastlane build
+      #   env:
+      #     MATCH_REPO: ${{ secrets.MATCH_REPO }}
+      #     MATCH_PASSWORD: ${{ secrets.MATCH_PASS }}
+      #     SIGNING_ID: ${{ secrets.SIGNING_ID }}
+      #     APPLE_ACCOUNT: ${{ secrets.APPLE_ACCOUNT }}
+      #     TEAM_ID: ${{ secrets.TEAM_ID }}
+      #   run: |
+      #     fastlane compile --verbose
+      # - name: Run fastlane deploy
+      #   env:
+      #     HOCKEY_TOKEN: ${{ secrets.HOCKEY_TOKEN}}
+      #     APPLE_ACCOUNT: ${{ secrets.APPLE_ACCOUNT }}
+      #     TEAM_ID: ${{ secrets.TEAM_ID }}
+      #   run: fastlane deploy --verbose
