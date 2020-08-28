@@ -92,50 +92,50 @@ platform :ios do
 
 
 
-  desc "Upload to TestFlight"
-  desc "Options:"
-  desc "  - bump_type (none, patch, minor, major)"
-  lane :test_flight do |options|
+  # desc "Upload to TestFlight"
+  # desc "Options:"
+  # desc "  - bump_type (none, patch, minor, major)"
+  # lane :test_flight do |options|
 
-    changelog = build_with_git(bump_type: options[:bump_type]) 
+  #   changelog = build_with_git(bump_type: options[:bump_type]) 
 
-    beta = JSON.parse(File.read("./resources/beta-app.json"))
+  #   beta = JSON.parse(File.read("./resources/beta-app.json"))
 
-    execute_for_all_envs{
-      pilot(
-        # changes
-        changelog: changelog,
+  #   execute_for_all_envs{
+  #     pilot(
+  #       # changes
+  #       changelog: changelog,
 
-        # review info
-        demo_account_required: true, 
+  #       # review info
+  #       demo_account_required: true, 
 
-        beta_app_review_info: {
-          contact_email: beta["contactEmail"],
-          contact_first_name: beta["contactFirstName"],
-          contact_last_name: beta["contactLastName"],
-          contact_phone: beta["contactPhone"],
-          demo_account_name: beta["demoAccountName"],
-          notes: beta["notes"]
-        },
+  #       beta_app_review_info: {
+  #         contact_email: beta["contactEmail"],
+  #         contact_first_name: beta["contactFirstName"],
+  #         contact_last_name: beta["contactLastName"],
+  #         contact_phone: beta["contactPhone"],
+  #         demo_account_name: beta["demoAccountName"],
+  #         notes: beta["notes"]
+  #       },
 
-        # app info
-        localized_app_info: {
-          "default": {
-            feedback_email: beta["feedbackEmail"],
-            marketing_url: beta["marketingURL"],
-            privacy_policy_url: beta["privacyURL"],
-            description: beta["description"]
-          },
-        },
+  #       # app info
+  #       localized_app_info: {
+  #         "default": {
+  #           feedback_email: beta["feedbackEmail"],
+  #           marketing_url: beta["marketingURL"],
+  #           privacy_policy_url: beta["privacyURL"],
+  #           description: beta["description"]
+  #         },
+  #       },
 
-        # 
-        team_name: ENV['TEAM_NAME'],
-        app_identifier: ENV['BUNDLE_IDENTIFIER'],
-        skip_submission: true,
-        ipa: "fastlane/builds/#{ENV["ENV_NAME"]}/#{ENV["APP_NAME"]}.ipa"
-      )
-    }
-  end
+  #       # 
+  #       team_name: ENV['TEAM_NAME'],
+  #       app_identifier: ENV['BUNDLE_IDENTIFIER'],
+  #       skip_submission: true,
+  #       ipa: "fastlane/builds/#{ENV["ENV_NAME"]}/#{ENV["APP_NAME"]}.ipa"
+  #     )
+  #   }
+  # end
 
   desc "Options: "
   desc "  - bump_type "
