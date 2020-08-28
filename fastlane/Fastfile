@@ -71,7 +71,7 @@ platform :ios do
       app_identifier: ENV['APP_IDENTIFIER'],
       username: ENV['APPLE_ID'],
       team_id: ENV['TEAM_ID'],
-      git_url: ENV['MATCH_REPO']
+      git_url: ENV['MATCH_REPO'],
       type: "appstore", 
       readonly: true, 
       keychain_name: 'fastlane_ci', 

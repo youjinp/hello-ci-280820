@@ -7,6 +7,7 @@ push.github.secrets:
     		--owner $${SECRET_OWNER} \
     		--repo $${SECRET_REPO} \
 			--from-literal APPLE_ID=$${APPLE_ID} \
+			--from-literal APPLE_PASSWORD=$${APPLE_PASSWORD} \
     		--from-literal APP_IDENTIFIER=$${APP_IDENTIFIER} \
 			--from-literal TEAM_ID=$${TEAM_ID} \
 			--from-literal ITC_TEAM_ID=$${ITC_TEAM_ID} \
