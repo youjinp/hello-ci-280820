@@ -86,7 +86,7 @@ platform :ios do
     )
   end
 
-  lane: test_flight do
+  lane :test_flight do
     pilot(skip_waiting_for_build_processing: true)
   end 
 
