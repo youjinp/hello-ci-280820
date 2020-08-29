@@ -36,4 +36,5 @@ jobs:
 
       - run: bundle exec fastlane test_flight
         env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APPLICATION_SPECIFIC_PASSWORD }}
