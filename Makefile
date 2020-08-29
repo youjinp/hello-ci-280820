@@ -1,4 +1,7 @@
 
+session:
+	bundle exec fastlane spaceauth -u $$APPLE_ID 
+
 push.github.secrets:
 	$(info [*] run `source ./secrets` before calling this)
 	$(info [*] place pem files in ./pems/ before calling this)
@@ -13,4 +16,5 @@ push.github.secrets:
 		--from-literal MATCH_REPO=$${MATCH_REPO} \
 		--from-literal MATCH_PASSWORD=$${MATCH_PASSWORD} \
 		--from-literal MATCH_GIT_BASIC_AUTHORIZATION=$${MATCH_GIT_BASIC_AUTHORIZATION} \
-		--from-literal APPLE_APPLICATION_SPECIFIC_PASSWORD=$${APPLE_APPLICATION_SPECIFIC_PASSWORD}
+		--from-literal APPLE_APPLICATION_SPECIFIC_PASSWORD=$${APPLE_APPLICATION_SPECIFIC_PASSWORD} \
+		--from-literal FASTLANE_SESSION="$${FASTLANE_SESSION}"
