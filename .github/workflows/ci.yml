@@ -31,3 +31,9 @@ jobs:
       - run: bundle exec fastlane build
         env:
           SCHEME: Release
+
+      - run: bundle exec fastlane bump_build
+
+      - run: bundle exec fastlane test_flight
+        env:
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APPLICATION_SPECIFIC_PASSWORD }}

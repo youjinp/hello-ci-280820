@@ -26,7 +26,11 @@
 # (manual) xcode > select target > build settings > set  `Current Project Version` to `0`
 # (manual) check target > general > identity > version value is 0.0.0
 # (manual) check target > general > identity > build value is 0
-
+#
+# create 1024 x 1024 icon into `fastlane/metadata/app_icon.png`
+# fl add_plugin appicon
+# fl app_icons
+#
 ##############################################################################
 # More info about match private repo
 ##############################################################################
@@ -34,6 +38,19 @@
 # - have mfa on accounts that can access that repo
 # - optional: dedicated apple developer portal account dedicated to the team's assets
 #   - avoids mixing team and personal assets in the same bucket
+#
+##############################################################################
+# More info about app icon
+##############################################################################
+# illustrator
+# 1. design icon and background, get gradients [here](https://uigradients.com/#Blooker20)
+# 2. create a square of `1024 x 1024`
+# 3. drag the square layer to the top in `layers 
+# 4. select everything (without the grid), right click `Make clipping mask`
+# 5. create an artboard of size `1024 x 1024` or `1023 x 1023` (check output file is 1024x1024)
+# 6. move icon to the newly created artboard
+# 7. `file` > `export` > `export for screens` > select the 1024 artboard > `export`
+# 8. [ configure the export `png` type to have no transparency](https://community.adobe.com/t5/illustrator/exporting-selections-with-transparency/td-p/9553515) (set background to white/black)
 #
 ##############################################################################
 # Fastfile usage
@@ -83,12 +100,34 @@ platform :ios do
     build_app(
       scheme: ENV['SCHEME'],
       output_directory: "./fastlane/builds/",
+      output_name: "output.ipa",
+    )
+  end
+
+  lane :bump_build do
+    ensure_git_status_clean
+    build_number = increment_build_number
+    commit_version_bump(
+      force: true, # Forces the commit, even if other files than the ones containing the version number have been modified
+      message: "Bump buid to #{build_number}"
     )
   end
 
   lane :test_flight do
-    pilot(skip_waiting_for_build_processing: true)
+    pilot(
+      skip_waiting_for_build_processing: true,
+      username: ENV['APPLE_ID'],
+      ipa: "./fastlane/builds/output.ipa"
+    )
   end 
+
+  ### Local
+  lane :app_icons do
+    appicon(
+      appicon_devices: [:ipad, :iphone, :ios_marketing],
+      appicon_path: ENV["APP_ICON_PATH"]
+    )
+  end
 
 
 

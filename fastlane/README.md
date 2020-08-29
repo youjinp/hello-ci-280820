@@ -30,11 +30,12 @@ fastlane ios build
 ```
 fastlane ios test_flight
 ```
-Upload to TestFlight
 
-Options:
+### ios app_icons
+```
+fastlane ios app_icons
+```
 
-  - bump_type (none, patch, minor, major)
 
 ----
 
