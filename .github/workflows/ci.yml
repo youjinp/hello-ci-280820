@@ -28,11 +28,11 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
 
+      - run: bundle exec fastlane bump_build
+
       - run: bundle exec fastlane build
         env:
           SCHEME: Release
-
-      - run: bundle exec fastlane bump_build
 
       - run: bundle exec fastlane test_flight
         env:

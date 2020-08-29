@@ -21,6 +21,11 @@ or alternatively using `brew install fastlane`
 fastlane ios ci_setup
 ```
 
+### ios bump_build
+```
+fastlane ios bump_build
+```
+
 ### ios build
 ```
 fastlane ios build

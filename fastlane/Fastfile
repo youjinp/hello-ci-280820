@@ -96,13 +96,6 @@ platform :ios do
     )
   end
 
-  lane :build do
-    build_app(
-      scheme: ENV['SCHEME'],
-      output_directory: "./fastlane/builds/",
-      output_name: "output.ipa",
-    )
-  end
 
   lane :bump_build do
     ensure_git_status_clean
@@ -110,6 +103,14 @@ platform :ios do
     commit_version_bump(
       force: true, # Forces the commit, even if other files than the ones containing the version number have been modified
       message: "Bump buid to #{build_number}"
+    )
+  end
+  
+  lane :build do
+    build_app(
+      scheme: ENV['SCHEME'],
+      output_directory: "./fastlane/builds/",
+      output_name: "output.ipa",
     )
   end
 
