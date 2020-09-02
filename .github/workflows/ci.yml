@@ -1,9 +1,9 @@
 name: CI
 
-on: [push]
+on: [pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,31 +13,6 @@ jobs:
       # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md#xcode
       - run: sudo xcode-select -s /Applications/Xcode_12_beta.app
 
-      - run: bundle exec fastlane fastlane-credentials add --username ${APPLE_ID} --password ${APPLE_PASSWORD}
+      - run: bundle exec fastlane unit_tests
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-
-      - run: bundle exec fastlane ci_setup
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
-          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
-          MATCH_REPO: ${{ secrets.MATCH_REPO }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-
-      - run: bundle exec fastlane bump_build
-
-      # push changes?
-      - run: git push
-      # - run: bundle exec fastlane build
-      #   env:
-      #     SCHEME: Release
-      # - run: bundle exec fastlane test_flight
-      #   env:
-      #     APPLE_ID: ${{ secrets.APPLE_ID }}
-      #     FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-      #     FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-      #     FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
+          SCHEME: HelloCI280820
