@@ -51,7 +51,7 @@ jobs:
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
 
-      - run: git push
+      - run: git push origin HEAD:master
 
 env:
   FASTLANE_SKIP_DOCS: 1
