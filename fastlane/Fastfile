@@ -101,8 +101,16 @@ platform :ios do
     ensure_git_status_clean
     build_number = increment_build_number
     commit_version_bump(
-      force: true, # Forces the commit, even if other files than the ones containing the version number have been modified
+      force: false,
       message: "Bump buid to #{build_number}"
+    )
+  end
+
+  lane :set_version do |options|
+    version = options[:version]
+    ensure_git_status_clean
+    increment_version_number(
+      version_number: version
     )
   end
   
@@ -112,6 +120,10 @@ platform :ios do
       output_directory: "./fastlane/builds/",
       output_name: "output.ipa",
     )
+  end
+
+  lane :unit_tests do
+    run_tests(scheme: ENV["SCHEME"])
   end
 
   lane :test_flight do
