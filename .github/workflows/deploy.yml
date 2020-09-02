@@ -52,3 +52,6 @@ jobs:
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
 
       - run: git push
+
+env:
+  FASTLANE_SKIP_DOCS: 1
